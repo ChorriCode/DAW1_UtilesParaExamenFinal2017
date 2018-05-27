@@ -711,7 +711,7 @@ public class All {
 				// en la siguiente variable almacenamos la logitud max que va a tener el ancho de la columna despues de consultar a la BD con el método readOnTableMaxLenghtDataOfColumn()
 				maxLengthByColumns[i] = readOnTableMaxLenghtDataOfColumn(connectToBD(dataBaseName), tableName, columnNames[i]);
 				// ya sabiendo la logitud del dato más ancho de cada columna separamos las columnas nos el método hyphenatedFill();
-				System.out.print(columnNames[i] + hyphenatedFill(maxLengthByColumns[i],""));
+				System.out.print(columnNames[i] + hyphenatedFill(maxLengthByColumns[i]," "));
 			}
 			System.out.println();
 			while (resultDatas.next()) {
@@ -722,26 +722,20 @@ public class All {
 				if (i == columnsCount-1) {
 					System.out.print(resultDatas.getObject(i+1) + hyphenatedFill(maxLengthByColumns[i] + columnNames[i].length()-resultDatas.getObject(i+1).toString().length(), ""));
 				} else {
-					System.out.print(resultDatas.getObject(i+1) + hyphenatedFill(maxLengthByColumns[i] + columnNames[i].length()-resultDatas.getObject(i+1).toString().length(), "."));
+					//System.out.print(resultDatas.getObject(i+1) + hyphenatedFill(maxLengthByColumns[i] + columnNames[i].length()-resultDatas.getObject(i+1).toString().length(), "."));
+					System.out.print(resultDatas.getObject(i+1) + " " + hyphenatedFill(maxLengthByColumns[i] + columnNames[i].length()-resultDatas.getObject(i+1).toString().length()-2, ".")+"|");
 				}
-				
-				
+					
 			}
 			System.out.println();
-				
-				
-				
+
 			}
-			
-			
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
 
-		
 	}
 	
 }

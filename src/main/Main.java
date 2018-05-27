@@ -7,8 +7,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 
 import all.All;
+
 import model.Persona;
 
 
@@ -50,8 +52,8 @@ public class Main {
 		
 		
 		String dataBaseName = "paro";
-		String tableName = "islas";
-		String columnName = "isla";
+		String tableName = "provincias";
+		String columnName = "provincia";
 		
 		//Conectamos con la base de datos deseada;
 		Connection conn = myAll.connectToBD(dataBaseName);
@@ -66,6 +68,8 @@ public class Main {
 		String[] columnNames = {"CISLA","ISLA"};
 		Object[] valuesOfColumns = {9998,"BORRAMEISLA"};
 
+		
+		/*
 		// hacemos un insert y recogemos el entero que nos devuelve siendo el valor 1 que todo fue correcto y 0 que no se insertó;
 		int errorNumber = myAll.insertOnBD(conn, tableName, columnNames, valuesOfColumns);
 		System.out.println(errorNumber);
@@ -77,7 +81,9 @@ public class Main {
 		// hacemos un insert pero con otro método que le pasamos la cadena sql
 		errorNumber = myAll.insertOnBD(conn, sql);
 		System.out.println(errorNumber);
+		*/
 		
+		/*
 		// ahora borramos el último dato insertado
 		sql = "DELETE FROM " + tableName + " WHERE cisla = " + cisla; // como es una variable numerica no rodeamos el sql con comillas simples
 		errorNumber = myAll.deleteOnDB(conn, sql);
@@ -85,9 +91,22 @@ public class Main {
 		sql = "DELETE FROM " + tableName + " WHERE ISLA = '" + valuesOfColumns[1] + "'"; // recordar poner comillas simples rodeando a las variables String
 		errorNumber = myAll.deleteOnDB(conn, sql);
 		System.out.println(errorNumber + " - " + sql);
+		*/
 		
 		
 		
+		/*
+		ALGORITMO PARA AÑADIR DATOS A UN ARRAYLIST QUE ESTNA DENTRO DE UN HASHMAP ALGO COMO ESTO HashMap<String, ArrayList<String>>
+		mientras haya datos
+		si el arraylist esta null en esa clave del hashmap entonces crea un arralist nuevo
+		en cualquier caso siempre mete el dato en el arraylist y este en el hashmap
+		*/
+		
+		/*
+		PARA RECORRER EL CASO ANTERIOR POR EJEMPLO HashMap<String, ArrayList<String>> datosListado
+		necesitamos un for que recorra las claves del hashmap
+		y por cada clave que va recorriendo dentro otro for que recorra el ArrayList
+		 */
 		System.out.println("FIN"); // Tengo un break point para ver los valores de todas las variables antes de salir de la ejecución 
 	}
 
