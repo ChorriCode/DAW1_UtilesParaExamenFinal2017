@@ -22,6 +22,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
 import model.Persona;
 
 
@@ -32,6 +35,7 @@ import model.Persona;
  * 						   como herramienta para fines educativos.
  * 						   No se usa ningún patrón como pudiera ser MVC
  * 						   pues es un proyecto para copiar los métodos realizados y usarlos en tu proyecto
+ * 						   POR FAVOR, si usas algo de mi proyecto te pido me menciones en los comentarios de tu proyecto.
  */
 
 
@@ -416,6 +420,89 @@ public class All {
 		return conn;
 	}
 	
+	
+	// ---------- METODO HECHO EN CLASE, NO ES MIO. -------------- 
+	//OPTIENE LOS DATOS DE UNA TABLA SIENDO:  EL HASHMAP INTERNO LOS DATOS DE UNA FILA DONDE LA CLAVE - STRING ES EL NOMBRE DE LA COLUMNA Y EL OBJECT SU VALOR
+	//EL ARRAYLIST EXTERNO SERIA CADA UNA DE LAS FILAS DE LA TABLA 
+	
+	public ArrayList<HashMap<String, Object>> getAllRecords(String dataBaseName, String tableName) {
+
+		try {
+			ArrayList<HashMap<String, Object>> registros = new ArrayList<HashMap<String, Object>>();
+			Connection conexion = connectToBD(dataBaseName);
+			String sql = "SELECT * FROM " + tableName;
+			// + " where 1=2"
+			Statement stm = conexion.createStatement();
+			ResultSet rs = stm.executeQuery(sql);
+
+			ResultSetMetaData metaData = rs.getMetaData();
+			rs.first();
+			if (rs.getRow() == 0) {
+				System.out.println("NO HAY REGISTROS");
+				stm.close();
+				rs.close();
+				return null;
+			} else
+				rs.beforeFirst();
+			while (rs.next()) {
+
+				HashMap<String, Object> registro = new HashMap<String, Object>();
+				registros.add(registro);
+				for (int i = 1; i <= metaData.getColumnCount(); i++) {
+					registro.put(metaData.getColumnName(i), rs.getString(i));
+					System.out.print(metaData.getColumnName(i) + " => " + rs.getString(i) + "\t");
+				}
+
+				System.out.println();
+			}
+
+			stm.close();
+			rs.close();
+			return registros;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
+	// ---------- METODO HECHO EN CLASE, NO ES MIO. -------------- 
+	//OPTIENE LOS DATOS DE UNA TABLA SIENDO:  EL ARRAYLIST INTERNO LOS DATOS DE UNA FILA AL SER UN OBJETO SE ENTIENDE CON LOS ATRIBUTOS DE ESE OBJETOS SON LAS COLUMNAS
+	//EL ARRAYLIST EXTERNO SERIA CADA UNA DE LAS FILAS DE LA TABLA 
+	
+	
+	public ArrayList<ArrayList<Object>> getAllRecords2(String dataBaseName, String tableName) {
+
+		try {
+			ArrayList<ArrayList<Object>> registros = new ArrayList<ArrayList<Object>>();
+			Connection conexion = connectToBD(dataBaseName);
+			String sql = "SELECT * FROM " + tableName;
+			Statement stm = conexion.createStatement();
+			ResultSet rs = stm.executeQuery(sql);
+			ResultSetMetaData metaData = rs.getMetaData();
+			// primera fila: nombres de campos
+			ArrayList<Object> registro = new ArrayList<Object>();
+			registros.add(registro);
+			for (int i = 1; i <= metaData.getColumnCount(); i++)
+				registro.add(metaData.getColumnName(i));
+			// resto filas: valores de los campos
+			while (rs.next()) {
+				registro = new ArrayList<Object>();
+				registros.add(registro);
+				for (int i = 1; i <= metaData.getColumnCount(); i++) {
+					registro.add(rs.getString(i));
+					System.out.print(metaData.getColumnName(i) + " => " + rs.getString(i) + "\t");
+				}
+				System.out.println();
+			}
+			stm.close();
+			rs.close();
+			return registros;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+	
 	// ---------------- METODO PARA HACER UNA CONSULTA SELECT DE LECTURA A LA BASE DE DATOS QUE HAY EN EL METODO CONNECT TO DB Y LA TABLA DADA EN EL PARAMETRO -------------
 	
 	public ResultSet readOnBD(Connection conn, String table) {
@@ -436,6 +523,7 @@ public class All {
 		return myResultSet;
 	}
 	
+	// =================================================================================================================
 	
 	// ---------------- METODO PARA HACER UN INSERT LA BASE DE DATOS QUE HAY EN EL METODO CONNECT TO DB Y LA TABLA DADA EN EL PARAMETRO -------------
 	
@@ -467,22 +555,66 @@ public class All {
 				sql += insertSimpleQuotes + valuesOfColumns[i] + insertSimpleQuotes;
 		}
 		sql += ")"; // Cadena de consulta a la tabla islas y en este caso recordemos que la conexion es a la base de datos paro
-		System.out.println(sql);
+		
 		
 		try {
 			
 			Statement myStatement = conn.createStatement();
-			insertReturnCode = myStatement.executeUpdate(sql);
-			conn.close();	
+			insertReturnCode = myStatement.executeUpdate(sql); // Si la insercción fue correcta insertReturnCode =  1  sino será 0
+			//conn.close();	
 
-		} catch (SQLException e) {;
-			// TODO Auto-generated catch block
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			System.out.println("***** INSERTAR DUPLICADO *****");
+		} catch (SQLException e) {
+			
 			e.printStackTrace();
 		}
 		
 		return insertReturnCode;
 	}
 	
+	// ---------------- METODO PARA HACER UN INSERT LA BASE DE DATOS SE DEBE RELLENAR DENTRO DEL METODO LOS NOMBRES DE COLUMNAS Y LAS VARIABLES DE LAS COLUMNAS -------------
+	
+	public int insertOnBD(Connection conn, String sql) {
+		int insertReturnCode = 0;
+		
+		try {
+			
+			Statement myStatement = conn.createStatement();
+			insertReturnCode = myStatement.executeUpdate(sql); // Si la insercción fue correcta insertReturnCode =  1  sino será 0
+			//conn.close();	
+
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			System.out.println("***** INSERTAR DUPLICADO *****");
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return insertReturnCode;
+	}
+	// =================================================================================================================
+	
+	// ---------------- METODO PARA HACER UN DELETE LA BASE QUE ESTÁ DEFINIDDA EN EL METODO connectToBD() Y LA TABLA DADA EN EL PARAMETRO -------------
+	
+	
+	public int deleteOnDB(Connection conn, String sql) {
+		int insertReturnCode = 0;
+		try {
+			Statement myStatement = conn.createStatement();
+			insertReturnCode = myStatement.executeUpdate(sql);
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return insertReturnCode;
+		
+	}
+	
+	
+	// =================================================================================================================
 	
 	// ---------------- METODO PARA HACER UNA CONSULTA SELECT DE LECTURA A LA BASE DE DATOS QUE ME DEVUELVA QUE LONGITUD TIENE EL DATO MAS LARGO DE UNA COLUMNA ESPECIFICADA -------------
 	
@@ -534,7 +666,26 @@ public class All {
 		int columnsCount = 0;
 		String[] columnNames = null;
 		int[] maxLengthByColumns = null;
+		
+
 		try {
+			
+			//comprobamos si el resultDatas que nos envían es null nos salimos del método, no hay nada que mostrar
+			if (resultDatas != null) {
+				resultDatas.first();
+				
+				// en caso de que no sea nulo, todavía puede pasar que la tabla no tenga datos y por tanto tampoco hay nada que mostrar;
+				if (resultDatas.getRow() == 0) {
+					System.out.println("NO HAY REGISTROS");		
+					resultDatas.close();
+					return;
+				} else
+					resultDatas.beforeFirst();
+			} else {
+				System.out.println("ResulSet NULL");
+				return;
+			}
+
 			
 			metaDatas = resultDatas.getMetaData();
 			dataBaseName = metaDatas.getCatalogName(1);
@@ -589,15 +740,6 @@ public class All {
 			e.printStackTrace();
 		}
 	
-		
-
-		
-		
-		
-		
-		
-		
-		
 
 		
 	}

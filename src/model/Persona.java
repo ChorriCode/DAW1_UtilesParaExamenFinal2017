@@ -10,6 +10,7 @@ import java.time.LocalDate;
  * 						   como herramienta para fines educativos.
  * 						   No se usa ningún patrón como pudiera ser MVC
  * 						   pues es un proyecto para copiar los métodos realizados y usarlos en tu proyecto
+ * 						   POR FAVOR, si usas algo de mi proyecto te pido me menciones en los comentarios de tu proyecto.
  */
 
 public class Persona implements Serializable, Comparable<Persona> {
