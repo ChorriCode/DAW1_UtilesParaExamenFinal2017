@@ -39,13 +39,27 @@ public class Main {
 		*/
 		
 		String dataBaseName = "paro";
-		String tableName = "municipios";
-		String columnName = "municipio";
+		String tableName = "islas";
+		String columnName = "isla";
 		
+		//Conectamos con la base de datos deseada;
 		Connection conn = myAll.connectToBD(dataBaseName);
+		
+		//hacemos una consulta sobre una tabla en concreto;
 		ResultSet result = myAll.readOnBD(conn, tableName);
-		int maxLenghtDataColumn = myAll.readOnTableMaxLenghtDataOfColumn(conn, tableName, columnName);
+		
+		// mostramos los datos de la consulta anterior
 		myAll.showResultSetDatas(result);
+		
+		// asignamos datos de pruena para posterior mente usarios en un insert
+		String[] columnNames = {"CISLA","ISLA"};
+		Object[] valuesOfColumns = {9999,"BORRAMEISLA"};
+
+		// hacemos un insert y recogemos el entero que nos devuelve siendo el valor 1 que todo fue correcto y 0 que no se insertó;
+		int errorNumber = myAll.insertOnBD(conn, tableName, columnNames, valuesOfColumns);
+		System.out.println(errorNumber);
+		
+		
 		System.out.println("FIN"); // Tengo un break point para ver los valores de todas las variables antes de salir de la ejecución 
 	}
 

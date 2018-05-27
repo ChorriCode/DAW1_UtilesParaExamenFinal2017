@@ -409,7 +409,7 @@ public class All {
 		return conn;
 	}
 	
-	// ---------------- METODO PARA HACER UNA CONSULTA SELECT DE LECTURA A LA BASE DE DATOS QUE HAY EN EL METODO CONNECT TO DB Y LA TABLA ISLAS -------------
+	// ---------------- METODO PARA HACER UNA CONSULTA SELECT DE LECTURA A LA BASE DE DATOS QUE HAY EN EL METODO CONNECT TO DB Y LA TABLA DADA EN EL PARAMETRO -------------
 	
 	public ResultSet readOnBD(Connection conn, String table) {
 		ResultSet myResultSet = null;
@@ -420,13 +420,60 @@ public class All {
 			Statement myStatement = conn.createStatement();
 			myStatement.execute("use "+ conn.getCatalog());
 			myResultSet = myStatement.executeQuery(sql);	
-
+			
 		} catch (SQLException e) {;
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		return myResultSet;
+	}
+	
+	
+	// ---------------- METODO PARA HACER UN INSERT LA BASE DE DATOS QUE HAY EN EL METODO CONNECT TO DB Y LA TABLA DADA EN EL PARAMETRO -------------
+	
+	public int insertOnBD(Connection conn, String table, String[] columnNames, Object[] valuesOfColumns) {
+		int insertReturnCode = 0;
+		String insertSimpleQuotes = ""; // la usaremos dentro del String SQL para con un condicional preguntar si el valor es de la clase String querremos rodearlo de comillas simples
+
+		// A partir de aquí vamos a preparar el insert SQL concatenando el Array de String que nos llega con los nombres de columnas y el Array de Objetos con los valores
+		// El de valores es de objetos para que al menos admita String e int. no está preparado aún para otros tipos de datos como LocalDate
+		String sql ="INSERT INTO " + table + "(";
+		for (int i = 0; i < columnNames.length; i++) {
+			
+			if (i != columnNames.length-1) // no queremos que el último dato termina con una ","
+				sql += columnNames[i] + ",";
+			else
+				sql += columnNames[i];
+		}
+		sql += ") VALUES (";
+		for (int i = 0; i < valuesOfColumns.length; i++) {
+			
+			if (valuesOfColumns[i].getClass() == String.class) 
+				insertSimpleQuotes = "'"; // hemos preguntado en el if anterior si la clase del dato valor que nos llega es de tipo String para rodearlo de comillas simples
+			else
+				insertSimpleQuotes = ""; // en caso de que no sea un String no lo rodeará de comillas simples en este caso valer para datos de tipo numericos
+			
+			if (i != valuesOfColumns.length-1)
+				sql += insertSimpleQuotes + valuesOfColumns[i] + insertSimpleQuotes + ",";
+			else
+				sql += insertSimpleQuotes + valuesOfColumns[i] + insertSimpleQuotes;
+		}
+		sql += ")"; // Cadena de consulta a la tabla islas y en este caso recordemos que la conexion es a la base de datos paro
+		System.out.println(sql);
+		
+		try {
+			
+			Statement myStatement = conn.createStatement();
+			insertReturnCode = myStatement.executeUpdate(sql);
+			conn.close();	
+
+		} catch (SQLException e) {;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return insertReturnCode;
 	}
 	
 	
@@ -471,7 +518,7 @@ public class All {
 	
 	// =================================================================================================================
 
-	// ---------------- ESTE METODO MUESTRA LOS DATOS DE UN RESULT SET -------------
+	// ---------------- ESTE METODO MUESTRA LOS DATOS DE UN RESULT SET Y SE ADAPTA AL NUMERO DE COLUMNAS QUE TENGA EL RESULSET -------------
 	
 	public  void showResultSetDatas(ResultSet resultDatas ) {
 		ResultSetMetaData metaDatas = null;
